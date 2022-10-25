@@ -80,4 +80,10 @@
 
     </record>
 
+     <menuitem id="menu_patient"
+              name="Patients"
+              action="action_hospital_patient"
+              parent="menu_patient_master"
+              sequence="0"/>
+
 </odoo>

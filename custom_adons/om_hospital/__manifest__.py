@@ -15,6 +15,7 @@
         'views/menu.xml',
         'views/patient_view.xml',
         'views/patient_female_view.xml',
+        'views/appointment_view.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [],
