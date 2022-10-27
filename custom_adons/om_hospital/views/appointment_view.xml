@@ -14,11 +14,20 @@
         <field name="name">hospital.appointment.tree</field>
         <field name="model">hospital.appointment</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree decoration-success="status == 'done'"
+            decoration-warning="status == 'in_consultation'"
+            decoration-danger="status == 'cancel'">
                 <field name="patient_id"/>
-                <field name="appointment_time"/>
-                <field name="booking_date"/>
-                <field name="gender"/>
+                <field name="appointment_time" optional="show"/>
+                <field name="booking_date" optional="show"/>
+                <field name="gender" optional="show"/>
+                <field name="activity_ids" widget="list_activity"/>
+                <field name="status"
+                       decoration-success="status == 'done'"
+                       decoration-warning="status == 'in_consultation'"
+                       decoration-info="status == 'draft'"
+                       decoration-danger="status == 'cancel'"
+                       widget="badge"/>
             </tree>
         </field>
     </record>
@@ -28,17 +37,41 @@
         <field name="model">hospital.appointment</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <field name="status" widget="statusbar" nolabel="1" options="{'clickable' : '1'}"
+                    statusbar_visible="draft,in_consultation,done"/>
+                </header>
                 <sheet>
+                    <div>
+                        <h1>
+                            <field name="priority" widget="priority"/>
+                        </h1>
+                    </div>
                     <group>
                         <group>
                             <field name="patient_id"/>
+                            <field name="ref"/>
                             <field name="appointment_time"/>
                         </group>
                         <group>
                             <field name="booking_date"/>
                             <field name="gender"/>
+                            <button name="object_button" string="Object Button" type="object" class="oe_highlight"/>
+                            <button name="%(om_hospital.action_hospital_patient)d"
+                                    confirm="Are you sure to open the patient action ?"
+                                    help="On clicking this button, you will be on patient records"
+                                    string="Action Button" type="action" class="oe_highlight"/>
                         </group>
                     </group>
+
+                    <notebook>
+                        <page string="Prescription" name="prescription">
+                            <field name="prescription" placeholder="Enter Your Prescription"/>
+                        </page>
+                        <page string="Pharmacy" name="pharmacy">
+                        </page>
+                    </notebook>
+
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" groups="base.group_user"/>
