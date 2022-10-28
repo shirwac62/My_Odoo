@@ -15,11 +15,14 @@
         <field name="model">hospital.appointment</field>
         <field name="arch" type="xml">
             <tree decoration-success="status == 'done'"
-            decoration-warning="status == 'in_consultation'"
-            decoration-danger="status == 'cancel'">
+                  decoration-warning="status == 'in_consultation'"
+                  decoration-danger="status == 'cancel'"
+                  sample="1"
+                  multi_edit="1">
                 <field name="patient_id"/>
                 <field name="appointment_time" optional="show"/>
                 <field name="booking_date" optional="show"/>
+                <field name="doctor_id" widget="many2one_avatar_user"/>
                 <field name="gender" optional="show"/>
                 <field name="activity_ids" widget="list_activity"/>
                 <field name="status"
@@ -38,8 +41,12 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <field name="status" widget="statusbar" nolabel="1" options="{'clickable' : '1'}"
-                    statusbar_visible="draft,in_consultation,done"/>
+                    <button name="action_cancel" string="Cancel" class="oe_highlight" type="object" status="draft, in_consultation"/>
+                    <button name="action_in_consultation" string="In Consultation"  data-hotkey="z" type="object" status="draft"/>
+                    <button name="action_done" string="Done" type="object" status="in_consultation"/>
+                    <!--options="{'clickable' : '1'}"-->
+                    <field name="status" widget="statusbar" nolabel="1"
+                           statusbar_visible="draft,in_consultation,done"/>
                 </header>
                 <sheet>
                     <div>
@@ -49,12 +56,13 @@
                     </div>
                     <group>
                         <group>
-                            <field name="patient_id"/>
+                            <field name="patient_id" default_focus="1"/>
                             <field name="ref"/>
                             <field name="appointment_time"/>
                         </group>
                         <group>
                             <field name="booking_date"/>
+                            <field name="doctor_id" widget="many2one_avatar_users"/>
                             <field name="gender"/>
                             <button name="object_button" string="Object Button" type="object" class="oe_highlight"/>
                             <button name="%(om_hospital.action_hospital_patient)d"
@@ -66,7 +74,8 @@
 
                     <notebook>
                         <page string="Prescription" name="prescription">
-                            <field name="prescription" placeholder="Enter Your Prescription"/>
+                            <field name="prescription" placeholder="Enter Your Prescription"
+                                   options="{'resizable' : true}"/>
                         </page>
                         <page string="Pharmacy" name="pharmacy">
                         </page>
