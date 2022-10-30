@@ -41,9 +41,11 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_cancel" string="Cancel" class="oe_highlight" type="object" status="draft, in_consultation"/>
-                    <button name="action_in_consultation" string="In Consultation"  data-hotkey="z" type="object" status="draft"/>
-                    <button name="action_done" string="Done" type="object" status="in_consultation"/>
+                    <button name="action_cancel" string="Cancel" class="oe_highlight" type="object"
+                            status="draft, in_consultation"/>
+                    <button name="action_in_consultation" string="In Consultation" data-hotkey="z" class="oe_highlight" type="object"
+                            status="draft"/>
+                    <button name="action_done" string="Done" class="oe_highlight" type="object" status="in_consultation"/>
                     <!--options="{'clickable' : '1'}"-->
                     <field name="status" widget="statusbar" nolabel="1"
                            statusbar_visible="draft,in_consultation,done"/>
@@ -61,14 +63,18 @@
                             <field name="appointment_time"/>
                         </group>
                         <group>
+                            <field name="hide_sales_price" groups="base.group_no_one"/>
                             <field name="booking_date"/>
                             <field name="doctor_id" widget="many2one_avatar_users"/>
                             <field name="gender"/>
-                            <button name="object_button" string="Object Button" type="object" class="oe_highlight"/>
+                            <button name="object_button" string="Object Button" type="object"
+                                    class="oe_highlight"
+                                    groups="base.group_no_one"/>
                             <button name="%(om_hospital.action_hospital_patient)d"
                                     confirm="Are you sure to open the patient action ?"
                                     help="On clicking this button, you will be on patient records"
-                                    string="Action Button" type="action" class="oe_highlight"/>
+                                    string="Action Button" type="action" class="oe_highlight"
+                                    groups="base.group_no_one"/>
                         </group>
                     </group>
 
@@ -78,6 +84,21 @@
                                    options="{'resizable' : true}"/>
                         </page>
                         <page string="Pharmacy" name="pharmacy">
+                            <field name="pharmacy_line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="price_unit"
+                                           attrs="{'column_invisible': [('parent.hide_sales_price', '=', True)]}"/>
+                                    <field name="qty"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="product_id"/>
+                                        <field name="price_unit"/>
+                                        <field name="qty"/>
+                                    </group>
+                                </form>
+                            </field>
                         </page>
                     </notebook>
 
