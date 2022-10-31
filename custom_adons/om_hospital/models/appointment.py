@@ -18,11 +18,11 @@ class HospitalAppointment(models.Model):
         ('1', 'Low'),
         ('2', 'High'),
         ('3', 'Very High')], string='Priority')
-    status = fields.Selection([
+    state = fields.Selection([
         ('draft', 'Draft'),
         ('in_consultation', 'In Consultation'),
         ('done', 'Done'),
-        ('cancel', 'Cancelled')], default="draft", string='Status', required=True)
+        ('cancel', 'Cancelled')], default="draft", string='state', required=True)
     doctor_id = fields.Many2one('res.users', string='Doctor', tracking=True)
     pharmacy_line_ids = fields.One2many('appointment.pharmacy.line', 'appointment_id', string='Pharmacy Line')
     hide_sales_price = fields.Boolean(string='Hide Sales Price')
@@ -43,15 +43,15 @@ class HospitalAppointment(models.Model):
 
     def action_cancel(self):
         for rec in self:
-            rec.status = 'cancel'
+            rec.state = 'cancel'
 
     def action_in_consultation(self):
         for rec in self:
-            rec.status = 'in_consultation'
+            rec.state = 'in_consultation'
 
     def action_done(self):
         for rec in self:
-            rec.status = 'done'
+            rec.state = 'done'
 
 
 class AppointmentPharmacyLines(models.Model):
