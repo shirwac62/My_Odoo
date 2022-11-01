@@ -26,7 +26,7 @@ class HospitalPatient(models.Model):
             else:
                 rec.age = 0
 
-    @api.onchange('gender')
-    def onchange_age(self):
-        if self.gender == 'male':
-            self.age = 0
+    # @api.onchange('gender')
+    # def onchange_age(self):
+    #     if self.gender == 'male':
+    #         self.age = 0

@@ -57,7 +57,7 @@
                             <field name="gender"/>
                             <field name="ref"/>
                             <!--widget="many2many_tags"-->
-                            <field name="tag_ids"/>
+<!--                            <field name="tag_ids"/>-->
                             <field name="active"/>
                         </group>
                     </group>

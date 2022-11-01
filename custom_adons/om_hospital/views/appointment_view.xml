@@ -62,18 +62,33 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_cancel" string="Cancel" class="oe_highlight" type="object"
-                            states="draft, in_consultation"/>
-                    <!--<button name="%(om_hospital.action_cancel_appointment)d" string="Cancel" class="oe_highlight" type="action"-->
-                    <!--state="draft, in_consultation"/>-->
-                    <button name="action_in_consultation" string="In Consultation" data-hotkey="z" class="oe_highlight"
-                            type="object"
-                            states="draft"/>
-                    <button name="action_done" string="Done" class="oe_highlight" type="object"
-                            states="in_consultation"/>
-                    <!--options="{'clickable' : '1'}"-->
+
+                     <button name="action_second" string="Second" class="oe_highlight" type="object"
+                            states="one"/>
+                     <button name="action_first" string="First" class="oe_highlight" type="object"
+                            states="two"/>
+                     <button name="action_third" string="Third" class="oe_highlight" type="object"
+                            states="two"/>
+
+
+
+<!--                    -->
+<!--                    <button name="action_cancel" string="Cancel" class="oe_highlight" type="object"-->
+<!--                            states="draft, in_consultation"/>-->
+<!--                    &lt;!&ndash;<button name="%(om_hospital.action_cancel_appointment)d" string="Cancel" class="oe_highlight" type="action"&ndash;&gt;-->
+<!--                    &lt;!&ndash;state="draft, in_consultation"/>&ndash;&gt;-->
+<!--                    <button name="action_in_consultation" string="In Consultation" data-hotkey="z" class="oe_highlight"-->
+<!--                            type="object"-->
+<!--                            states="draft"/>-->
+<!--                    <button name="action_done" string="Done" class="oe_highlight" type="object"-->
+<!--                            states="in_consultation"/>-->
+<!--                    &lt;!&ndash;options="{'clickable' : '1'}"&ndash;&gt;-->
+
+
+
+
                     <field name="state" widget="statusbar" nolabel="1"
-                           statusbar_visible="draft,in_consultation,done"/>
+                           statusbar_visible="one,two,three"/>
                 </header>
                 <sheet>
                     <div>
