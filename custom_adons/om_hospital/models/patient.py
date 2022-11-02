@@ -15,7 +15,18 @@ class HospitalPatient(models.Model):
     gender = fields.Selection([('male', 'Male'), ('female', 'Female')], string='Gender', tracking=True)
     active = fields.Boolean(string="Active", default=True)
     image = fields.Image(string="Image")
-    tag_ids = fields.Many2many('patient.tag', 'Tags')
+    tag_ids = fields.Many2many('patient.tag', string='Tags')
+    appointment_id = fields.Many2one('hospital.appointment', string="Appointment")
+
+    @api.model
+    def create(self, vals):
+        vals['ref'] = self.env['ir.sequence'].next_by_code('hospital.patient')
+        return super(HospitalPatient, self).create(vals)
+
+    def write(self, vals):
+        if not self.ref and not vals.get('ref'):
+            vals['ref'] = self.env['ir.sequence'].next_by_code('hospital.patient')
+        return super(HospitalPatient, self).write(vals)
 
     @api.depends('date_of_birth')
     def _compute_age(self):
@@ -25,6 +36,14 @@ class HospitalPatient(models.Model):
                 rec.age = today.year - rec.date_of_birth.year
             else:
                 rec.age = 0
+
+    def name_get(self):
+        patient_list = []
+        for record in self:
+            name = record.name + '--' + record.ref
+            patient_list.append((record.id, name))
+
+        return patient_list
 
     # @api.onchange('gender')
     # def onchange_age(self):
