@@ -40,6 +40,10 @@
                   decoration-danger="state == 'cancel'"
                   sample="1"
                   multi_edit="1">
+                <header>
+                    <button name="action_in_consultation" string="In Consultation"
+                            type="object"/>
+                </header>
                 <field name="patient_id"/>
                 <field name="appointment_time" optional="show"/>
                 <field name="booking_date" optional="show"/>
@@ -52,6 +56,16 @@
                        decoration-info="state == 'draft'"
                        decoration-danger="state == 'cancel'"
                        widget="badge"/>
+                <button name="action_done" class="fa fa-check btn-success"
+                        attrs="{'invisible': [('state', '!=', 'in_consultation')]}"
+                        type="object"/>
+                <button name="%(om_hospital.action_cancel_appointment)d" class="fa fa-times btn-danger"
+                        type="action"
+                        attrs="{'invisible': [('state', 'not in', ('draft','in_consultation'))]}"/>
+                <groupby name="patient_id">
+                    <button name="action_test" string="Click Me" type="object" class="oe_highlight"/>
+                    <button name="edit" string="Edit" type="edit"/>
+                </groupby>
             </tree>
         </field>
     </record>
@@ -63,32 +77,30 @@
             <form>
                 <header>
 
-                     <button name="action_second" string="Second" class="oe_highlight" type="object"
-                            states="one"/>
-                     <button name="action_first" string="First" class="oe_highlight" type="object"
-                            states="two"/>
-                     <button name="action_third" string="Third" class="oe_highlight" type="object"
-                            states="two"/>
+                    <!--                     <button name="action_second" string="Second" class="oe_highlight" type="object"-->
+                    <!--                            states="one"/>-->
+                    <!--                     <button name="action_first" string="First" class="oe_highlight" type="object"-->
+                    <!--                            states="two"/>-->
+                    <!--                     <button name="action_third" string="Third" class="oe_highlight" type="object"-->
+                    <!--                            states="two"/>-->
 
 
-
-<!--                    -->
-<!--                    <button name="action_cancel" string="Cancel" class="oe_highlight" type="object"-->
-<!--                            states="draft, in_consultation"/>-->
-<!--                    &lt;!&ndash;<button name="%(om_hospital.action_cancel_appointment)d" string="Cancel" class="oe_highlight" type="action"&ndash;&gt;-->
-<!--                    &lt;!&ndash;state="draft, in_consultation"/>&ndash;&gt;-->
-<!--                    <button name="action_in_consultation" string="In Consultation" data-hotkey="z" class="oe_highlight"-->
-<!--                            type="object"-->
-<!--                            states="draft"/>-->
-<!--                    <button name="action_done" string="Done" class="oe_highlight" type="object"-->
-<!--                            states="in_consultation"/>-->
-<!--                    &lt;!&ndash;options="{'clickable' : '1'}"&ndash;&gt;-->
-
-
+                    <!--                    <button name="action_cancel" string="Cancel" class="oe_highlight" type="object"-->
+                    <!--                            states="draft, in_consultation"/>-->
+                    <button name="%(om_hospital.action_cancel_appointment)d" string="Cancel" class="oe_highlight"
+                            type="action"
+                            context="{'default_reason': 'test', 'hide_appointment': 1}"
+                            state="draft, in_consultation"/>
+                    <button name="action_in_consultation" string="In Consultation" data-hotkey="z" class="oe_highlight"
+                            type="object"
+                            state="draft"/>
+                    <button name="action_done" string="Done" class="oe_highlight" type="object"
+                            state="in_consultation"/>
+                    <!--options="{'clickable' : '1'}"-->
 
 
-                    <field name="state" widget="statusbar" nolabel="1"
-                           statusbar_visible="one,two,three"/>
+                    <!--                    <field name="state" widget="statusbar" nolabel="1"-->
+                    <!--                           statusbar_visible="one,two,three"/>-->
                 </header>
                 <sheet>
                     <div>

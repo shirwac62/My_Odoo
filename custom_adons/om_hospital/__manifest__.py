@@ -23,6 +23,8 @@
         'views/patient_female_view.xml',
         'views/appointment_view.xml',
         'views/patient_tag.xml',
+        'views/less_than_20.xml',
+        'views/odoo_playground_view.xml',
     ],
     'demo': [],
     'installable': True,

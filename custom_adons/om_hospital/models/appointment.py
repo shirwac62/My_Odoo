@@ -1,4 +1,5 @@
-from odoo import api, models, fields
+from odoo import api, models, fields, _
+from odoo.exceptions import ValidationError
 
 
 class HospitalAppointment(models.Model):
@@ -7,7 +8,7 @@ class HospitalAppointment(models.Model):
     _description = "Hospital Appointment"
     _rec_name = 'patient_id'
 
-    patient_id = fields.Many2one('hospital.patient', string='Patient')
+    patient_id = fields.Many2one('hospital.patient', string='Patient', ondelete='restrict')
     gender = fields.Selection(related='patient_id.gender')
     appointment_time = fields.Datetime(string='Appointment Time', default=fields.Datetime.now)
     booking_date = fields.Date(string='Booking Date', default=fields.Date.context_today)
@@ -19,13 +20,23 @@ class HospitalAppointment(models.Model):
         ('2', 'High'),
         ('3', 'Very High')], string='Priority')
     state = fields.Selection([
-        ('one', 'One'),
-        ('two', 'Two'),
-        ('three', 'Three')], default="one", string='state', required=True)
-    # ('cancel', 'Cancelled')], default="draft", string='state', required=True)
+        ('draft', 'Draft'),
+        ('in_consultation', 'In Consultation'),
+        ('done', 'Done'),
+        ('cancel', 'Cancelled')], default="draft", string='state', required=True)
     doctor_id = fields.Many2one('res.users', string='Doctor', tracking=True)
     pharmacy_line_ids = fields.One2many('appointment.pharmacy.line', 'appointment_id', string='Pharmacy Line')
     hide_sales_price = fields.Boolean(string='Hide Sales Price')
+
+    @api.model
+    def create(self, vals):
+        vals['ref'] = self.env['ir.sequence'].next_by_code('hospital.appointment')
+        return super(HospitalAppointment, self).create(vals)
+
+    def unlink(self):
+        if self.state != 'draft':
+            raise ValidationError(_('You Can only Delete The appointment With Draft status'))
+        return super(HospitalAppointment, self).unlink()
 
     @api.onchange('patient_id')
     def onchange_patient_id(self):
@@ -41,29 +52,30 @@ class HospitalAppointment(models.Model):
             }
         }
 
-    def action_first(self):
+    # def action_first(self):
+    #     for rec in self:
+    #         rec.state = 'one'
+    #
+    # def action_second(self):
+    #     for rec in self:
+    #         rec.state = 'two'
+    #
+    # def action_third(self):
+    #     for rec in self:
+    #         rec.state = 'three'
+    #
+    def action_cancel(self):
         for rec in self:
-            rec.state = 'one'
+            rec.state = 'cancel'
 
-    def action_second(self):
+    def action_in_consultation(self):
         for rec in self:
-            rec.state = 'two'
+            if rec.state == 'draft':
+                rec.state = 'in_consultation'
 
-    def action_third(self):
+    def action_done(self):
         for rec in self:
-            rec.state = 'three'
-    #
-    # def action_cancel(self):
-    #     for rec in self:
-    #         rec.state = 'cancel'
-    #
-    # def action_in_consultation(self):
-    #     for rec in self:
-    #         rec.state = 'in_consultation'
-    #
-    # def action_done(self):
-    #     for rec in self:
-    #         rec.state = 'done'
+            rec.state = 'done'
 
 
 class AppointmentPharmacyLines(models.Model):

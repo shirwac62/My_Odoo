@@ -13,5 +13,19 @@
             </field>
         </record>
 
+        <record id="nafic_inherit_product_inherit" model="ir.ui.view">
+            <field name="name">product.inherit.om</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='barcode']" position="after">
+                    <field name="ref"/>
+                </xpath>
+                <xpath expr="//button[@name='action_open_label_layout']" position="after">
+                    <buttton name ="action_confirm" type="object" string="Fill"/>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>
