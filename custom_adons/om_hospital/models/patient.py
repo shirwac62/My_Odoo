@@ -2,6 +2,7 @@ from datetime import date
 
 from odoo.exceptions import ValidationError
 from odoo import api, models, fields, _
+from dateutil import relativedelta
 
 
 class HospitalPatient(models.Model):
@@ -12,7 +13,8 @@ class HospitalPatient(models.Model):
     name = fields.Char(string='Name', tracking=True)
     ref = fields.Char(string='Reference')
     date_of_birth = fields.Date(string='Date Of  Birth')
-    age = fields.Integer(string='Age', compute='_compute_age', tracking=True, store=True)
+    age = fields.Integer(string='Age', compute='_compute_age', inverse='_inverse_compute_age',
+                         search='_search_age', tracking=True, store=True)
     gender = fields.Selection([('male', 'Male'), ('female', 'Female')], string='Gender', tracking=True)
     active = fields.Boolean(string="Active", default=True)
     image = fields.Image(string="Image")
@@ -24,6 +26,11 @@ class HospitalPatient(models.Model):
     martial_status = fields.Selection([('married', 'Married'), ('single', 'Single')], string='Martial Status',
                                       tracking=True)
     partner_name = fields.Char(string='Partner Name')
+
+    medicine_id = fields.One2many('medicine', 'patient_id_medicine', string='Medicine')
+
+    def action_compute_bill(self):
+        return
 
     @api.depends('appointment_ids')
     def _compute_appointment_count(self):
@@ -62,6 +69,12 @@ class HospitalPatient(models.Model):
             else:
                 rec.age = 0
 
+    @api.depends('age')
+    def _inverse_compute_age(self):
+        today = date.today()
+        for rec in self:
+            rec.date_of_birth = today - relativedelta.relativedelta(years=rec.age)
+
     def name_get(self):
         patient_list = []
         for record in self:
@@ -78,3 +91,32 @@ class HospitalPatient(models.Model):
     # def onchange_age(self):
     #     if self.gender == 'male':
     #         self.age = 0
+
+    def _search_age(self, operation, value):
+        date_of_birth = date.today() - relativedelta.relativedelta(years=value)
+        start_of_year = date_of_birth.replace(day=1, month=1)
+        end_of_year = date_of_birth.replace(day=31, month=12)
+        return [('date_of_birth', '>=', start_of_year), ('date_of_birth', '<=', end_of_year)]
+
+
+class Medicine(models.Model):
+    _name = "medicine"
+    _description = "Medicine"
+
+    medicine_name = fields.Char(string="Name")
+    amount = fields.Float(string='Amount')
+    quantity = fields.Float(string="Quantity")
+    total_amount = fields.Float(string='Total Amount', compute='_calculate_amount')
+    # amount_total = fields.Integer(string='Total', store=True, compute='_amount_all')
+    patient_id_medicine = fields.Many2one('hospital.patient', string='Patient')
+
+    @api.depends('amount', 'quantity')
+    def _calculate_amount(self):
+        for rec in self:
+            if rec.quantity > 0:
+                rec.total_amount = rec.amount * rec.quantity
+
+    @api.depends('total_amount')
+    def _amount_all(self):
+        for rec in self:
+            rec.amount_total += rec.total_amount
