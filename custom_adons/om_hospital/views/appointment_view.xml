@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+       <record id="action_mark_as_done" model="ir.actions.server">
+        <field name="name">Mark As Done</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_hospital_appointment"/>
+        <field name="binding_model_id" ref="model_hospital_appointment"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            for record in records:
+                if record.state == 'in_consultation':
+                    record.action_done()
+        </field>
+    </record>
+
+
     <record id="view_hospital_appointment_activity" model="ir.ui.view">
         <field name="name">hospital.appointment.activity</field>
         <field name="model">hospital.appointment</field>
@@ -30,6 +45,16 @@
         </field>
     </record>
 
+    <record id="view_hospital_appointment_calendar" model="ir.ui.view">
+        <field name="name">hospital.appointment.calendar</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <calendar string="Appointments" date_start="booking_date">
+                <field name="patient_id"/>
+            </calendar>
+        </field>
+    </record>
+
 
     <record id="view_hospital_appointment_tree" model="ir.ui.view">
         <field name="name">hospital.appointment.tree</field>
@@ -45,8 +70,10 @@
                             type="object"/>
                 </header>
                 <field name="patient_id"/>
+                <field name="ref" readonly="1" force_save="1"/>
                 <field name="appointment_time" optional="show"/>
                 <field name="booking_date" optional="show"/>
+                <field name="operation_id" optional="show"/>
                 <field name="doctor_id" widget="many2one_avatar_user"/>
                 <field name="gender" optional="show"/>
                 <field name="activity_ids" widget="list_activity"/>
@@ -66,6 +93,7 @@
                     <button name="action_test" string="Click Me" type="object" class="oe_highlight"/>
                     <button name="edit" string="Edit" type="edit"/>
                 </groupby>
+                <field name="progress" widget="progressbar"/>
             </tree>
         </field>
     </record>
@@ -110,9 +138,11 @@
                     </div>
                     <group>
                         <group>
-                            <field name="patient_id" default_focus="1"/>
-                            <field name="ref"/>
+<!--                             default_focus="1"-->
+                            <field name="patient_id" widget="selection"/>
+                            <field name="ref" readonly="1" force_save="1"/>
                             <field name="appointment_time"/>
+                            <field name="operation_id"/>
                         </group>
                         <group>
                             <field name="hide_sales_price" groups="base.group_no_one"/>
@@ -131,6 +161,11 @@
                     </group>
 
                     <notebook>
+                        <page string="Progress" name="progress">
+<!--                            <field name="progress" widget="percentpie"-->
+                            <field name="progress" widget="gauge"
+                            options="{'style': 'width:100px; height:100px;'}"/>
+                        </page>
                         <page string="Prescription" name="prescription">
                             <field name="prescription" placeholder="Enter Your Prescription"
                                    options="{'collaborative': true, 'resizable' : true, 'codeview': true}"/>
@@ -168,7 +203,7 @@
         <field name="name">Appointments</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">hospital.appointment</field>
-        <field name="view_mode">tree,form,activity</field>
+        <field name="view_mode">tree,form,calendar,activity</field>
         <field name="context">{}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

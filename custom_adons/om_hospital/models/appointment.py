@@ -1,3 +1,5 @@
+import random
+
 from odoo import api, models, fields, _
 from odoo.exceptions import ValidationError
 
@@ -7,12 +9,13 @@ class HospitalAppointment(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Hospital Appointment"
     _rec_name = 'patient_id'
+    _order = 'id desc'
 
     patient_id = fields.Many2one('hospital.patient', string='Patient', ondelete='restrict')
     gender = fields.Selection(related='patient_id.gender')
     appointment_time = fields.Datetime(string='Appointment Time', default=fields.Datetime.now)
     booking_date = fields.Date(string='Booking Date', default=fields.Date.context_today)
-    ref = fields.Char(string='Reference')
+    ref = fields.Char(string='Reference', related='patient_id.ref')
     prescription = fields.Html(string='Prescription')
     priority = fields.Selection([
         ('0', 'Normal'),
@@ -27,6 +30,8 @@ class HospitalAppointment(models.Model):
     doctor_id = fields.Many2one('res.users', string='Doctor', tracking=True)
     pharmacy_line_ids = fields.One2many('appointment.pharmacy.line', 'appointment_id', string='Pharmacy Line')
     hide_sales_price = fields.Boolean(string='Hide Sales Price')
+    operation_id = fields.Many2one('hospital.operation', string='Operation')
+    progress = fields.Integer(string='Progress', compute='_compute_progress')
 
     @api.model
     def create(self, vals):
@@ -76,6 +81,19 @@ class HospitalAppointment(models.Model):
     def action_done(self):
         for rec in self:
             rec.state = 'done'
+
+    @api.depends('state')
+    def _compute_progress(self):
+        for rec in self:
+            if rec.state == 'draft':
+                progress = random.randrange(0, 25)
+            elif rec.state == 'in_consultation':
+                progress = random.randrange(25, 99)
+            elif rec.state == 'done':
+                progress = 100
+            else:
+                progress = 0
+            rec.progress = progress
 
 
 class AppointmentPharmacyLines(models.Model):

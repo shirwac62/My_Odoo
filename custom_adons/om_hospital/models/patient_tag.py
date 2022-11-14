@@ -1,4 +1,5 @@
 from odoo import fields, models, api, _
+from odoo.exceptions import ValidationError
 
 
 class PatientTag(models.Model):
@@ -20,7 +21,13 @@ class PatientTag(models.Model):
         default['sequence'] = 10
         return super(PatientTag, self).copy(default)
 
-    _sql_constraints = [
-        ('unique_tag_name', 'unique (name, active)', 'Name Must Be Unique.'),
-        ('check_sequence', 'check (sequence > 0)', 'Sequence Must Be Greater than Zero Or Positive Number'),
-    ]
+    @api.constrains('name')
+    def _check_name_unique(self):
+        name_counts = self.search_count([('name', '=', self.name), ('id', '!=', self.id)])
+        if name_counts > 0:
+            raise ValidationError("Name already exists!")
+
+    # _sql_constraints = [
+    #     ('unique_tag_name', 'unique (name, active)', 'Name Must Be Unique.'),
+    #     ('check_sequence', 'check (sequence > 0)', 'Sequence Must Be Greater than Zero Or Positive Number'),
+    # ]

@@ -28,6 +28,10 @@ class HospitalPatient(models.Model):
     partner_name = fields.Char(string='Partner Name')
 
     medicine_id = fields.One2many('medicine', 'patient_id_medicine', string='Medicine')
+    is_birthday = fields.Boolean(string='Birthday ?', compute='_compute_is_birthday')
+    phone = fields.Char(string='Phone')
+    email = fields.Char(string='Email')
+    website = fields.Char(string='Website')
 
     def action_compute_bill(self):
         return
@@ -98,6 +102,16 @@ class HospitalPatient(models.Model):
         end_of_year = date_of_birth.replace(day=31, month=12)
         return [('date_of_birth', '>=', start_of_year), ('date_of_birth', '<=', end_of_year)]
 
+    @api.depends('date_of_birth')
+    def _compute_is_birthday(self):
+        for rec in self:
+            is_birthday = False
+            if rec.date_of_birth:
+                today = date.today()
+                if today.day == rec.date_of_birth.day and today.month == rec.date_of_birth.month:
+                    is_birthday = True
+            rec.is_birthday = is_birthday
+
 
 class Medicine(models.Model):
     _name = "medicine"
@@ -107,16 +121,24 @@ class Medicine(models.Model):
     amount = fields.Float(string='Amount')
     quantity = fields.Float(string="Quantity")
     total_amount = fields.Float(string='Total Amount', compute='_calculate_amount')
+    discount = fields.Float(string='Discount %')
     # amount_total = fields.Integer(string='Total', store=True, compute='_amount_all')
     patient_id_medicine = fields.Many2one('hospital.patient', string='Patient')
 
-    @api.depends('amount', 'quantity')
+    @api.depends('amount', 'quantity', 'discount')
     def _calculate_amount(self):
         for rec in self:
             if rec.quantity > 0:
-                rec.total_amount = rec.amount * rec.quantity
+                total = rec.amount * rec.quantity
+                total_discount = (total * rec.discount) / 100
+                rec.total_amount = total - total_discount
+            else:
+                rec.total_amount = 1
 
-    @api.depends('total_amount')
-    def _amount_all(self):
-        for rec in self:
-            rec.amount_total += rec.total_amount
+                # total_discount = (total_amount * discount) / 100
+
+    # (amount * qty) - (amount * discount / 100)
+    # @api.depends('total_amount')
+    # def _amount_all(self):
+    #     for rec in self:
+    #         rec.amount_total += rec.total_amount

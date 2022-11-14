@@ -51,6 +51,16 @@
                     <button name="action_compute_bill" string="Compute Bill" class="oe_highlight" type="object"/>
                 </header>
                 <sheet>
+                    <div class="alert alert-success text-center o_form_header" role="alert"
+                         attrs="{'invisible': [('is_birthday', '=', False)]}">
+                        <a class="close" data-dismiss="alert" href="#">x</a>
+                        <div>
+                            <strong>Today Is Birthday</strong>
+                        </div>
+                        <div>Wish
+                            <field name="name" readonly="1"/>
+                        </div>
+                    </div>
                     <field name="image" widget="image" class="oe_avatar"/>
                     <div class="oe_title">
                         <h4>
@@ -66,13 +76,14 @@
                             <field name="name"/>
                             <field name="date_of_birth"/>
                             <field name="age"/>
-                            <field name="appointment_count"/>
+                            <field name="is_birthday"/>
+                            <field name="appointment_count" sum="Total Of Appointment Count"/>
                             <!--                            <field name="appointment_id"/>-->
                         </group>
                         <group>
                             <field name="gender" invisible="context.get('hide_gender')" widget="radio"/>
                             <field name="ref"/>
-                            <field name="tag_ids" widget="many2many_tags" options="{'color_field':'color'}"/>
+                            <field name="tag_ids" widget="many2many_checkboxes" options="{'color_field':'color'}"/>
                             <field name="active"/>
                         </group>
                     </group>
@@ -84,6 +95,11 @@
                                    attrs="{'readonly':[('martial_status' ,'!=','married')],
                                            'required':[('martial_status','=','married')]}"/>
                         </group>
+                        <group>
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="website" widget="url"/>
+                        </group>
                     </group>
                     <notebook>
                         <page name="medicine" string="Medicine">
@@ -93,9 +109,10 @@
                                         <field name="medicine_name"/>
                                         <field name="amount"/>
                                         <field name="quantity"/>
+                                        <field name="discount"/>
                                         <field name="total_amount" sum="Total Of Amount"/>
-<!--                                        <field name="amount_total"-->
-<!--                                               decoration-bf="1" optional="show"/>-->
+                                        <!--                                        <field name="amount_total"-->
+                                        <!--                                               decoration-bf="1" optional="show"/>-->
                                     </tree>
                                     <form>
                                         <sheet>
@@ -103,9 +120,10 @@
                                                 <field name="medicine_name"/>
                                                 <field name="amount"/>
                                                 <field name="quantity"/>
+                                                <field name="discount"/>
                                                 <field name="total_amount"/>
-<!--                                                <field name="amount_total"-->
-<!--                                                       decoration-bf="1" optional="show"/>-->
+                                                <!--                                                <field name="amount_total"-->
+                                                <!--                                                       decoration-bf="1" optional="show"/>-->
                                             </group>
                                         </sheet>
                                     </form>
