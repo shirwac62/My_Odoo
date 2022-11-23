@@ -14,6 +14,8 @@
                             <field name="ref"/>
                         </group>
                     </group>
+                       <button name="action_execute" string="Execute" data-hotkey="z" class="oe_highlight"
+                            type="object"/>
                 </sheet>
             </form>
         </field>

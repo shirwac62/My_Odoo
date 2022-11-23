@@ -33,6 +33,11 @@ class HospitalAppointment(models.Model):
     operation_id = fields.Many2one('hospital.operation', string='Operation')
     progress = fields.Integer(string='Progress', compute='_compute_progress')
 
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
+    currency_id = fields.Many2one('res.currency', related='company_id.currency_id')
+    float_total = fields.Float(string='Total Float')
+    monetary_total = fields.Monetary(string='Total Monetary')
+
     @api.model
     def create(self, vals):
         vals['ref'] = self.env['ir.sequence'].next_by_code('hospital.appointment')
@@ -47,14 +52,18 @@ class HospitalAppointment(models.Model):
     def onchange_patient_id(self):
         self.ref = self.patient_id.ref
 
+    # return {
+    #     'effect': {
+    #         'fadeout': 'slow',
+    #         'message': 'click successful',
+    #         'type': 'rainbow_man'
+    #     }
+    # }
     def object_button(self):
-        print("Button Clicked")
         return {
-            'effect': {
-                'fadeout': 'slow',
-                'message': 'click successful',
-                'type': 'rainbow_man'
-            }
+            'type': 'ir.actions.act_url',
+            'target': 'self',
+            'url': 'https://www.odoo.com'
         }
 
     # def action_first(self):
@@ -104,3 +113,11 @@ class AppointmentPharmacyLines(models.Model):
     price_unit = fields.Float(related='product_id.list_price')
     qty = fields.Integer(string='Quantity', default=1)
     appointment_id = fields.Many2one('hospital.appointment', string='Appointment')
+    company_currency_id = fields.Many2one('res.currency', related='appointment_id.currency_id')
+    price_subtotal = fields.Monetary(string='Subtotal', compute='_compute_price_subtotal',
+                                     currency_field='company_currency_id')
+
+    @api.depends('price_unit', 'qty')
+    def _compute_price_subtotal(self):
+        for rec in self:
+            rec.price_subtotal = rec.price_unit * rec.qty

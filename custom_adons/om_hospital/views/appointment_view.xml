@@ -49,8 +49,12 @@
         <field name="name">hospital.appointment.calendar</field>
         <field name="model">hospital.appointment</field>
         <field name="arch" type="xml">
-            <calendar string="Appointments" date_start="booking_date">
-                <field name="patient_id"/>
+            <!--            date_delay="duration"-->
+            <calendar string="Appointments" date_start="booking_date" mode="month"
+                      color="state" quick_add="False" hide_time="True" event_open_popup="True"
+                      form_view_id="%(om_hospital.view_hospital_appointment_form)d" event_limit="5">
+                <field name="patient_id" filters="1" avatar_field="image"/>
+                <field name="state" filters="1" invisible="1"/>
             </calendar>
         </field>
     </record>
@@ -75,7 +79,7 @@
                 <field name="booking_date" optional="show"/>
                 <field name="operation_id" optional="show"/>
                 <field name="doctor_id" widget="many2one_avatar_user"/>
-                <field name="gender" optional="show"/>
+                <field name="gender" optional="show" decoration-it="1" decoration-bf="1" decoration-success="gender=='female'"/>
                 <field name="activity_ids" widget="list_activity"/>
                 <field name="state"
                        decoration-success="state == 'done'"
@@ -149,7 +153,7 @@
                             <field name="booking_date"/>
                             <field name="doctor_id" widget="many2one_avatar_users"/>
                             <field name="gender"/>
-                            <button name="object_button" string="Object Button" type="object"
+                            <button name="object_button" string="Redirect Button" type="object"
                                     class="oe_highlight"
                                     groups="base.group_no_one"/>
                             <button name="%(om_hospital.action_hospital_patient)d"
@@ -174,9 +178,11 @@
                             <field name="pharmacy_line_ids">
                                 <tree editable="bottom">
                                     <field name="product_id"/>
-                                    <field name="price_unit"
+                                    <field name="price_unit" widget="monetary"
                                            attrs="{'column_invisible': [('parent.hide_sales_price', '=', True)]}"/>
                                     <field name="qty"/>
+                                    <field name="company_currency_id" invisible="1"/>
+                                    <field name="price_subtotal"/>
                                 </tree>
                                 <form>
                                     <group>
@@ -188,7 +194,10 @@
                             </field>
                         </page>
                     </notebook>
-
+                    <group>
+                        <field name="float_total"/>
+                        <field name="monetary_total" widget="monetary"/>
+                    </group>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" groups="base.group_user"/>

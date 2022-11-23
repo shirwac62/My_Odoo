@@ -27,7 +27,7 @@ class PatientTag(models.Model):
         if name_counts > 0:
             raise ValidationError("Name already exists!")
 
-    # _sql_constraints = [
-    #     ('unique_tag_name', 'unique (name, active)', 'Name Must Be Unique.'),
-    #     ('check_sequence', 'check (sequence > 0)', 'Sequence Must Be Greater than Zero Or Positive Number'),
-    # ]
+    _sql_constraints = [
+        ('unique_tag_name', 'unique (name, active)', 'Name Must Be Unique.'),
+        ('check_sequence', 'check (sequence > 0)', 'Sequence Must Be Greater than Zero Or Positive Number'),
+    ]

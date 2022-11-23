@@ -32,14 +32,29 @@ class HospitalPatient(models.Model):
     phone = fields.Char(string='Phone')
     email = fields.Char(string='Email')
     website = fields.Char(string='Website')
+    hole_total = fields.Float(string='Total', compute='_hole_total')
 
     def action_compute_bill(self):
         return
 
     @api.depends('appointment_ids')
     def _compute_appointment_count(self):
-        for rec in self:
-            rec.appointment_count = self.env['hospital.appointment'].search_count([('patient_id', '=', rec.id)])
+        print('..............', self)
+        appointment_group = self.env['hospital.appointment'].read_group(domain=[],
+                                                                        fields=['patient_id'], groupby=['patient_id'])
+        for appointment in appointment_group:
+            patient_id = appointment.get('patient_id')
+            if patient_id:
+                patient_rec = self.browse(patient_id[0])
+                patient_rec.appointment_count = appointment['patient_id_count']
+                self -= patient_rec
+        self.appointment_count = 0
+
+    #
+    # @api.depends('appointment_ids')
+    # def _compute_appointment_count(self):
+    #     for rec in self:
+    #         rec.appointment_count = self.env['hospital.appointment'].search_count([('patient_id', '=', rec.id)])
 
     @api.ondelete(at_uninstall=False)
     def _check_appointments(self):
@@ -112,6 +127,34 @@ class HospitalPatient(models.Model):
                     is_birthday = True
             rec.is_birthday = is_birthday
 
+    @api.depends('medicine_id')
+    def _hole_total(self):
+        for rec in self:
+            total_discount = 0
+            total_amount = 0
+            if rec.medicine_id:
+                for medicine in rec.medicine_id:
+                    total_amount += medicine.total_amount
+                    total_discount += medicine.discount
+                    all_total_discount = (total_amount * total_discount) / 100
+                    rec.hole_total = total_amount - all_total_discount
+            else:
+                rec.hole_total = total_amount
+
+    def action_view_appointments(self):
+        return {
+            'name': _('Appointments'),
+            'res_model': 'hospital.appointment',
+            'view_mode': 'list,form',
+            # 'context': {'default_patient_id': self.ids},
+            'context': {'default_patient_id': self.id},
+            'domain': [('patient_id', '=', self.ids)],
+            'target': 'current',
+            'type': 'ir.actions.act_window',
+            # 'view_id': self.env.ref('base.view_translation_dialog_tree').id,
+            # 'flags': {'search_view': True, 'action_buttons': True},
+        }
+
 
 class Medicine(models.Model):
     _name = "medicine"
@@ -120,22 +163,27 @@ class Medicine(models.Model):
     medicine_name = fields.Char(string="Name")
     amount = fields.Float(string='Amount')
     quantity = fields.Float(string="Quantity")
-    total_amount = fields.Float(string='Total Amount', compute='_calculate_amount')
+    total_amount = fields.Float(string='Total Amount', compute='calculate_total_amount')
     discount = fields.Float(string='Discount %')
     # amount_total = fields.Integer(string='Total', store=True, compute='_amount_all')
     patient_id_medicine = fields.Many2one('hospital.patient', string='Patient')
 
-    @api.depends('amount', 'quantity', 'discount')
-    def _calculate_amount(self):
+    @api.depends('amount', 'quantity')
+    def calculate_total_amount(self):
         for rec in self:
-            if rec.quantity > 0:
-                total = rec.amount * rec.quantity
-                total_discount = (total * rec.discount) / 100
-                rec.total_amount = total - total_discount
-            else:
-                rec.total_amount = 1
+            rec.total_amount = rec.amount * rec.quantity
 
-                # total_discount = (total_amount * discount) / 100
+    # @api.depends('amount', 'quantity', 'discount')
+    # def _calculate_amount(self):
+    #     for rec in self:
+    #         if rec.quantity > 0:
+    #             total = rec.amount * rec.quantity
+    #             total_discount = (total * rec.discount) / 100
+    #             rec.total_amount = total - total_discount
+    #         else:
+    #             rec.total_amount = 1
+
+    # total_discount = (total_amount * discount) / 100
 
     # (amount * qty) - (amount * discount / 100)
     # @api.depends('total_amount')
