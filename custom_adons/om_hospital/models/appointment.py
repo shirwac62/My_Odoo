@@ -1,4 +1,6 @@
 import random
+from datetime import datetime
+from dateutil import relativedelta
 
 from odoo import api, models, fields, _
 from odoo.exceptions import ValidationError
@@ -37,6 +39,43 @@ class HospitalAppointment(models.Model):
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id')
     float_total = fields.Float(string='Total Float')
     monetary_total = fields.Monetary(string='Total Monetary')
+
+    assignment_total = fields.Float(string='Total')
+    refund = fields.Integer(string='Refund')
+
+    def action_share_whatsapp(self):
+        if not self.patient_id.phone:
+            raise ValidationError(_('Missing Phone Number In This Patient Record'))
+        message = 'Hi %s' % self.patient_id.name
+        whatsapp_api_url = 'https://api.whatsapp.com/send?phone=%s&text=%s' % (self.patient_id.phone, message)
+        self.message_post(body=message, subject='WhatsApp Message')
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': whatsapp_api_url
+        }
+
+    def action_notification(self):
+        action = self.env.ref('om_hospital.action_hospital_patient')
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': '%s',
+                'links': [{
+                    'label': self.patient_id.name,
+                    'url': f'#action{action.id}&id={self.patient_id.id}&model=hospital.patient'
+                }],
+                'type': 'success',
+                'sticky': False,
+                'next': {
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'hospital.patient',
+                    'res_id': self.patient_id.id,
+                    'views': [(False, 'form')]
+                }
+            }
+        }
 
     @api.model
     def create(self, vals):
@@ -110,7 +149,7 @@ class AppointmentPharmacyLines(models.Model):
     _description = "Appointment Pharmacy Line"
 
     product_id = fields.Many2one('product.product', required=True)
-    price_unit = fields.Float(related='product_id.list_price')
+    price_unit = fields.Float(related='product_id.list_price', digits='Product Price')
     qty = fields.Integer(string='Quantity', default=1)
     appointment_id = fields.Many2one('hospital.appointment', string='Appointment')
     company_currency_id = fields.Many2one('res.currency', related='appointment_id.currency_id')

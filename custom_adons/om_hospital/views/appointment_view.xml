@@ -119,6 +119,9 @@
 
                     <!--                    <button name="action_cancel" string="Cancel" class="oe_highlight" type="object"-->
                     <!--                            states="draft, in_consultation"/>-->
+                    <button name="action_share_whatsapp" string="Share In WhatsApp" data-hotkey="w" class="oe_highlight"
+                            type="object"
+                           icon="fa-whatsapp"/>
                     <button name="%(om_hospital.action_cancel_appointment)d" string="Cancel" class="oe_highlight"
                             type="action"
                             context="{'default_reason': 'test', 'hide_appointment': 1}"
@@ -147,6 +150,8 @@
                             <field name="ref" readonly="1" force_save="1"/>
                             <field name="appointment_time"/>
                             <field name="operation_id"/>
+                            <field name="assignment_total"/>
+                            <field name="refund"/>
                         </group>
                         <group>
                             <field name="hide_sales_price" groups="base.group_no_one"/>
@@ -156,6 +161,8 @@
                             <button name="object_button" string="Redirect Button" type="object"
                                     class="oe_highlight"
                                     groups="base.group_no_one"/>
+                            <button name="action_notification" string="Notification Button" type="object" groups="base.group_no_one"
+                            class="oe_highlight"/>
                             <button name="%(om_hospital.action_hospital_patient)d"
                                     confirm="Are you sure to open the patient action ?"
                                     help="On clicking this button, you will be on patient records"
@@ -179,6 +186,7 @@
                                 <tree editable="bottom">
                                     <field name="product_id"/>
                                     <field name="price_unit" widget="monetary"
+                                           options="{'currency_field': 'currency_id', 'field_digits': True}"
                                            attrs="{'column_invisible': [('parent.hide_sales_price', '=', True)]}"/>
                                     <field name="qty"/>
                                     <field name="company_currency_id" invisible="1"/>
