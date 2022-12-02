@@ -43,6 +43,13 @@ class HospitalAppointment(models.Model):
     assignment_total = fields.Float(string='Total')
     refund = fields.Integer(string='Refund')
 
+    def action_send_mail(self):
+        template = self.env.ref('om_hospital.appointment_mail_template')
+        for rec in self:
+            if rec.patient_id.email:
+                email_values = {'subject': 'The Test one'}
+                template.send_mail(rec.id, force_send=True)
+
     def action_share_whatsapp(self):
         if not self.patient_id.phone:
             raise ValidationError(_('Missing Phone Number In This Patient Record'))
@@ -77,10 +84,24 @@ class HospitalAppointment(models.Model):
             }
         }
 
+    def set_line_number(self):
+        sl_no = 0
+        for line in self.pharmacy_line_ids:
+            sl_no += 1
+            line.sl_no = sl_no
+        return
+
     @api.model
     def create(self, vals):
         vals['ref'] = self.env['ir.sequence'].next_by_code('hospital.appointment')
-        return super(HospitalAppointment, self).create(vals)
+        res = super(HospitalAppointment, self).create(vals)
+        res.set_line_number()
+        return res
+
+    def write(self, vals):
+        res = super(HospitalAppointment, self).write(vals)
+        self.set_line_number()
+        return res
 
     def unlink(self):
         if self.state != 'draft':
@@ -148,6 +169,7 @@ class AppointmentPharmacyLines(models.Model):
     _name = "appointment.pharmacy.line"
     _description = "Appointment Pharmacy Line"
 
+    sl_no = fields.Integer(string='SNO')
     product_id = fields.Many2one('product.product', required=True)
     price_unit = fields.Float(related='product_id.list_price', digits='Product Price')
     qty = fields.Integer(string='Quantity', default=1)
