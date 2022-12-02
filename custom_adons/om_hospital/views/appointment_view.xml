@@ -122,6 +122,7 @@
                     <button name="action_share_whatsapp" string="Share In WhatsApp" data-hotkey="w" class="oe_highlight"
                             type="object"
                            icon="fa-whatsapp"/>
+                    <button name="action_send_mail" string="Send Mail" class="oe_highlight" type="object"/>
                     <button name="%(om_hospital.action_cancel_appointment)d" string="Cancel" class="oe_highlight"
                             type="action"
                             context="{'default_reason': 'test', 'hide_appointment': 1}"
@@ -184,6 +185,7 @@
                         <page string="Pharmacy" name="pharmacy">
                             <field name="pharmacy_line_ids">
                                 <tree editable="bottom">
+                                    <field name="sl_no" readonly="1"/>
                                     <field name="product_id"/>
                                     <field name="price_unit" widget="monetary"
                                            options="{'currency_field': 'currency_id', 'field_digits': True}"
