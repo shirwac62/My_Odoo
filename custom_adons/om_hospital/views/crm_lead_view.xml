@@ -1,31 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-
-        <record id="view_order_form_inherit" model="ir.ui.view">
-            <field name="name">sale.order.inherit</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form"/>
+        <record id="view_crm_lead_inherit" model="ir.ui.view">
+            <field name="name">crm.lead.inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='payment_term_id']" position="after">
-                    <field name="confirmed_user_id"/>
+                <!--                <xpath expr="//div[hasclass('col')]" position="after">-->
+                <xpath expr="//h2" position="after">
+                    <field name="company_type" widget="radio" options="{'horizontal': true}"/>
                 </xpath>
+
+
+                <notebook>
+                    <page name="customer_info" string="Customer Information">
+                        <group>
+                            <sheet>
+                                <group>
+
+                                    <group>
+                                        <field name="commercial_reg"/>
+                                        <field name="business_license"/>
+                                        <field name="passport"/>
+                                    </group>
+
+                                    <group attrs="{'invisible':[('company_type' ,'!=', 'company')]}">
+                                        <field name="article_of_association"/>
+                                        <field name="mou"/>
+                                        <field name="minutes"/>
+                                        <field name="resolution_latter"/>
+                                    </group>
+
+                                </group>
+                            </sheet>
+                        </group>
+                    </page>
+                </notebook>
+
             </field>
         </record>
 
-<!--        <record id="nafic_inherit_product_inherit" model="ir.ui.view">-->
-<!--            <field name="name">product.inherit.om</field>-->
-<!--            <field name="model">product.template</field>-->
-<!--            <field name="inherit_id" ref="product.product_template_only_form_view"/>-->
-<!--            <field name="arch" type="xml">-->
-<!--                <xpath expr="//field[@name='barcode']" position="after">-->
-<!--                    <field name="ref"/>-->
-<!--                </xpath>-->
-<!--                <xpath expr="//button[@name='action_open_label_layout']" position="after">-->
-<!--                    <buttton name ="action_confirm" type="object" string="Fill"/>-->
-<!--                </xpath>-->
-<!--            </field>-->
-<!--        </record>-->
+        <!--        <record id="nafic_inherit_product_inherit" model="ir.ui.view">-->
+        <!--            <field name="name">product.inherit.om</field>-->
+        <!--            <field name="model">product.template</field>-->
+        <!--            <field name="inherit_id" ref="product.product_template_only_form_view"/>-->
+        <!--            <field name="arch" type="xml">-->
+        <!--                <xpath expr="//field[@name='barcode']" position="after">-->
+        <!--                    <field name="ref"/>-->
+        <!--                </xpath>-->
+        <!--                <xpath expr="//button[@name='action_open_label_layout']" position="after">-->
+        <!--                    <buttton name ="action_confirm" type="object" string="Fill"/>-->
+        <!--                </xpath>-->
+        <!--            </field>-->
+        <!--        </record>-->
 
     </data>
 </odoo>
