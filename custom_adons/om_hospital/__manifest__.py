@@ -10,7 +10,7 @@
     'sequence': -100,
     'summary': 'Hospital Management System',
     'description': """Hospital Management System""",
-    'depends': ['mail', 'product', 'report_xlsx'],
+    'depends': ['mail', 'product', 'report_xlsx', 'crm'],
     'data': [
         'security/ir.model.access.csv',
         'security/security.xml',
@@ -28,6 +28,7 @@
         'views/odoo_playground_view.xml',
         'views/res_config_settings_views.xml',
         'views/operation_view.xml',
+        'views/crm_lead_view.xml',
         'report/patient_detail_report.xml',
         'report/patient_card.xml',
         'report/report.xml',

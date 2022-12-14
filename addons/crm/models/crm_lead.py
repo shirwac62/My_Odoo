@@ -106,6 +106,7 @@ class Lead(models.Model):
         'res.users', string='Salesperson', default=lambda self: self.env.user,
         domain="['&', ('share', '=', False), ('company_ids', 'in', user_company_ids)]",
         check_company=True, index=True, tracking=True)
+
     user_company_ids = fields.Many2many(
         'res.company', compute='_compute_user_company_ids',
         help='UX: Limit to lead company or all if no company')
