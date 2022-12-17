@@ -91,6 +91,8 @@
                                     </div>
                                 </div>
                             </h2>
+
+
                         </div>
                         <group>
                             <group name="lead_partner" attrs="{'invisible': [('type', '=', 'opportunity')]}">

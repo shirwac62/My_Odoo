@@ -21,7 +21,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['sale', 'mail'],
+    'depends': ['sale', 'mail', 'crm'],
 
     # always loaded
     'data': [
@@ -30,6 +30,7 @@
         'views/templates.xml',
         'views/account_move.xml',
         'views/partner_category.xml',
+        'views/crm_lead_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
